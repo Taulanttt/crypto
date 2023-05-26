@@ -1,7 +1,3 @@
-
-
-
-
 import requests
 from twilio.rest import Client
 
@@ -20,7 +16,7 @@ url = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
 
 # Twilio configuration
 twilio_account_sid = 'AC83df95c39a64cdf47f6a4cfa10fafa04'
-twilio_auth_token = 'f3c3539c6422e7494c1e520c703e9c73'
+twilio_auth_token = '58c6056af1e61ba3f3378a100463e65d'
 twilio_phone_number = '+13158894983'
 recipient_phone_number = '+38349569393'
 
@@ -42,10 +38,17 @@ if response.status_code == 200:
     for currency in data['data']:
         name = currency['name']
         price = currency['quote']['USD']['price']
-        sms_message += f"Name: {name}, Price: {price}\n"
+        percent_change_24h = currency['quote']['USD']['percent_change_24h']
+        if percent_change_24h > 0:
+            sms_message += f"Name: {name}, Price: {price}, 24h Change: {percent_change_24h}%\n"
+    if sms_message:  # Send SMS if there are any currencies with positive price change
+        send_sms(sms_message)
+        print("SMS sent successfully!")
+    else:
+        print("No currencies with positive price change.")
+
     
-    send_sms(sms_message)
-    print("SMS sent successfully!")
+    
 else:
     print('Error:', response.status_code)
     print(response.json())
